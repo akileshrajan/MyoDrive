@@ -7,6 +7,7 @@ package com.example.akilesh.myodrive;
 import android.app.Activity;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
@@ -14,7 +15,10 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
@@ -29,6 +33,8 @@ import com.thalmic.myo.Pose;
 import com.thalmic.myo.Quaternion;
 import com.thalmic.myo.XDirection;
 import com.thalmic.myo.scanner.ScanActivity;
+
+import java.lang.reflect.Method;
 
 public class BackgroundActivity extends Activity {private DeviceListener mListener = new AbstractDeviceListener() {
     boolean volumeMode = false;
@@ -67,11 +73,12 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
                 sleep = false;
                 break;
             case WAVE_IN:
-                back();
+
+                waveInAction();
                 volumeMode = false;
                 break;
             case WAVE_OUT:
-                skip();
+                waveOutAction();
                 volumeMode = false;
                 break;
         }
@@ -156,23 +163,66 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
     }
 
 
-    public void skip(){
+    public void waveOutAction(){
         Context ctx = getApplicationContext();
         AudioManager mAudioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
-        if (mAudioManager.isMusicActive()){
+        TelephonyManager teleManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+        PhoneCallListener  phoneCall=new PhoneCallListener();
+        teleManager.listen(phoneCall,PhoneStateListener.LISTEN_CALL_STATE);
+        if(teleManager.getCallState()==TelephonyManager.CALL_STATE_RINGING) {
+            Toast.makeText(ctx, "Accept call", Toast.LENGTH_SHORT);
+            Intent intent = new Intent(ctx, AcceptCallActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            ctx.startActivity(intent);
+           /* Intent rCallIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).putExtra(
+                    Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
+                            KeyEvent.KEYCODE_HEADSETHOOK));
+            ctx.sendOrderedBroadcast(rCallIntent, enforcedPerm);
+            Intent cCallIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).putExtra(
+                    Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
+                            KeyEvent.KEYCODE_HEADSETHOOK));
+            ctx.sendOrderedBroadcast(cCallIntent, enforcedPerm);*/
+            //sendBroadcast(cCallIntent);
+        }
+        else if (mAudioManager.isMusicActive()){
             Intent mediaIntent = new Intent("com.android.music.musicservicecommand");
             mediaIntent.putExtra("command", "next");
             sendBroadcast(mediaIntent);
         }
+            else {
+            return;
+            }
     }
 
-    public void back(){
+    public void waveInAction(){
         Context ctx = getApplicationContext();
         AudioManager mAudioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
-        if(mAudioManager.isMusicActive()){
+        TelephonyManager teleManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+        PhoneStateReceiver phoneListener=new PhoneStateReceiver();
+        PhoneCallListener  phoneCall=new PhoneCallListener();
+        teleManager.listen(phoneCall,PhoneStateListener.LISTEN_CALL_STATE);
+       // String enforcedPerm = "android.permission.CALL_PRIVILEGED";
+        if(teleManager.getCallState()==TelephonyManager.CALL_STATE_RINGING){
+            Toast.makeText(ctx, "End Call", Toast.LENGTH_SHORT);
+            phoneListener.killCall(ctx);
+           /* Intent rCallIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).putExtra(
+                    Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
+                            KeyEvent.KEYCODE_HEADSETHOOK));
+            ctx.sendOrderedBroadcast(rCallIntent, enforcedPerm);
+            Intent cCallIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).putExtra(
+                    Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
+                            KeyEvent.KEYCODE_HEADSETHOOK));
+            ctx.sendOrderedBroadcast(cCallIntent, enforcedPerm);*/
+            //sendBroadcast(cCallIntent);
+        }
+        else if(mAudioManager.isMusicActive()){
             Intent mediaIntent = new Intent("com.android.music.musicservicecommand");
             mediaIntent.putExtra("command", "previous");
             sendBroadcast(mediaIntent);
+        }
+        else {
+            return;
         }
     }
 
@@ -183,5 +233,49 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
         Intent intent = new Intent(context, ScanActivity.class);
         startActivity(intent);
         Log.d("test",  "done with scan activity");
+    }
+    //monitor phone call activities
+    private class PhoneCallListener extends PhoneStateListener {
+
+        private boolean isPhoneCalling = false;
+
+        String LOG_TAG = "LOGGING 123";
+
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+
+            if (TelephonyManager.CALL_STATE_RINGING == state) {
+                // phone ringing
+                Log.i(LOG_TAG, "RINGING, number: " + incomingNumber);
+            }
+
+            if (TelephonyManager.CALL_STATE_OFFHOOK == state) {
+                // active
+                Log.i(LOG_TAG, "OFFHOOK");
+
+                isPhoneCalling = true;
+            }
+
+            if (TelephonyManager.CALL_STATE_IDLE == state) {
+                // run when class initial and phone call ended,
+                // need detect flag from CALL_STATE_OFFHOOK
+                Log.i(LOG_TAG, "IDLE");
+
+                if (isPhoneCalling) {
+
+                    Log.i(LOG_TAG, "restart app");
+
+                    // restart app
+                    Intent i = getBaseContext().getPackageManager()
+                            .getLaunchIntentForPackage(
+                                    getBaseContext().getPackageName());
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+
+                    isPhoneCalling = false;
+                }
+
+            }
+        }
     }
 }

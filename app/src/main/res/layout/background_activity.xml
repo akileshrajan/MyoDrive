@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
+    android:layout_height="wrap_content"
+
     android:background="@android:color/darker_gray">
-
-
     <Button
-
         android:id="@+id/button_connect"
         android:onClick="connect"
         android:layout_alignParentRight="true"
@@ -18,5 +14,28 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dip"/>
 
+   <LinearLayout
+       android:layout_width="fill_parent"
+       android:layout_height="fill_parent"
+       android:orientation="horizontal"
+       android:paddingTop="20dp"
+       android:id="@+id/tapG"
+       android:layout_below="@+id/button_connect"
+       >
+
+       <ImageView android:id="@+id/tapGesture"
+               android:layout_width="match_parent"
+           android:layout_height="fill_parent"
+           android:adjustViewBounds="true"
+
+           android:scaleType="fitXY"
+           android:background="@android:color/white"
+
+           android:src="@drawable/gestures_black"
+           />
+
+
+
+   </LinearLayout>
 
 </RelativeLayout>
