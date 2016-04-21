@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.DeviceListener;
@@ -100,12 +102,40 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
         }
     }
 };
+    ListView list;
+    String[] web = {
+            "Unlock/Lock",
+            "Play/Pause",
+            "Previous Song/End Call",
+            "Next Song/Accept Call",
+            "Volume Control"
 
+    } ;
+    Integer[] imageId = {
+            R.drawable.unlock,
+            R.drawable.spread,
+            R.drawable.wave_in,
+            R.drawable.wave_out,
+            R.drawable.fist
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.background_activity);
 
+        CustomList adapter = new
+                CustomList(BackgroundActivity.this, web, imageId);
+        list=(ListView)findViewById(R.id.listGestures);
+        list.setAdapter(adapter);
+      /*  list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Toast.makeText(BackgroundActivity.this, "You Clicked at " + web[+position], Toast.LENGTH_SHORT).show();
+
+            }
+        });*/
         Hub hub = Hub.getInstance();
         if (!hub.init(this)) {
             Log.e("test", "Could not initialize the Hub.");

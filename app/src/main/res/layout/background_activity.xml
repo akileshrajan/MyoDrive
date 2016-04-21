@@ -12,17 +12,17 @@
         android:background="@android:color/white"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dip"/>
+        />
 
    <LinearLayout
        android:layout_width="fill_parent"
        android:layout_height="fill_parent"
        android:orientation="horizontal"
-       android:paddingTop="20dp"
+
        android:id="@+id/tapG"
        android:layout_below="@+id/button_connect"
        >
-
+<!--
        <ImageView android:id="@+id/tapGesture"
                android:layout_width="match_parent"
            android:layout_height="fill_parent"
@@ -31,9 +31,15 @@
            android:scaleType="fitXY"
            android:background="@android:color/white"
 
-           android:src="@drawable/gestures_black"
-           />
+           android:src="@drawable/fist"
+           />-->
+       <ListView
+           android:id="@+id/listGestures"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:background="@android:color/white">
 
+       </ListView>
 
 
    </LinearLayout>
