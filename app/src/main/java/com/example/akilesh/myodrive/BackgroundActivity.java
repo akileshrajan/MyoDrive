@@ -5,26 +5,17 @@ package com.example.akilesh.myodrive;
  */
 
 import android.app.Activity;
-
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.Toast;
-
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.DeviceListener;
 import com.thalmic.myo.Hub;
@@ -34,7 +25,6 @@ import com.thalmic.myo.Quaternion;
 import com.thalmic.myo.XDirection;
 import com.thalmic.myo.scanner.ScanActivity;
 
-import java.lang.reflect.Method;
 
 public class BackgroundActivity extends Activity {private DeviceListener mListener = new AbstractDeviceListener() {
     boolean volumeMode = false;
@@ -59,7 +49,6 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
             case FINGERS_SPREAD:
                 //volumeMode = true;
                 playPauseMusic();
-                //sleep = false;
                 break;
             case REST:
                 volumeMode = false;
@@ -73,7 +62,6 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
                 sleep = false;
                 break;
             case WAVE_IN:
-
                 waveInAction();
                 volumeMode = false;
                 break;
@@ -170,29 +158,20 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
         PhoneCallListener  phoneCall=new PhoneCallListener();
         teleManager.listen(phoneCall,PhoneStateListener.LISTEN_CALL_STATE);
         if(teleManager.getCallState()==TelephonyManager.CALL_STATE_RINGING) {
-            Toast.makeText(ctx, "Accept call", Toast.LENGTH_SHORT);
+            Toast.makeText(ctx, "Accept call", Toast.LENGTH_LONG);
             Intent intent = new Intent(ctx, AcceptCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
                     | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
             ctx.startActivity(intent);
-           /* Intent rCallIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).putExtra(
-                    Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                            KeyEvent.KEYCODE_HEADSETHOOK));
-            ctx.sendOrderedBroadcast(rCallIntent, enforcedPerm);
-            Intent cCallIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).putExtra(
-                    Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                            KeyEvent.KEYCODE_HEADSETHOOK));
-            ctx.sendOrderedBroadcast(cCallIntent, enforcedPerm);*/
-            //sendBroadcast(cCallIntent);
         }
         else if (mAudioManager.isMusicActive()){
             Intent mediaIntent = new Intent("com.android.music.musicservicecommand");
             mediaIntent.putExtra("command", "next");
             sendBroadcast(mediaIntent);
         }
-            else {
+        else {
             return;
-            }
+        }
     }
 
     public void waveInAction(){
@@ -204,7 +183,7 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
         teleManager.listen(phoneCall,PhoneStateListener.LISTEN_CALL_STATE);
        // String enforcedPerm = "android.permission.CALL_PRIVILEGED";
         if(teleManager.getCallState()==TelephonyManager.CALL_STATE_RINGING){
-            Toast.makeText(ctx, "End Call", Toast.LENGTH_SHORT);
+            Toast.makeText(ctx, "End Call", Toast.LENGTH_LONG);
             phoneListener.killCall(ctx);
            /* Intent rCallIntent = new Intent(Intent.ACTION_MEDIA_BUTTON).putExtra(
                     Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
@@ -215,6 +194,10 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
                             KeyEvent.KEYCODE_HEADSETHOOK));
             ctx.sendOrderedBroadcast(cCallIntent, enforcedPerm);*/
             //sendBroadcast(cCallIntent);
+        }
+        else if(teleManager.getCallState()==TelephonyManager.CALL_STATE_OFFHOOK) {
+            Toast.makeText(ctx, "End Call", Toast.LENGTH_LONG);
+            phoneListener.killCall(ctx);
         }
         else if(mAudioManager.isMusicActive()){
             Intent mediaIntent = new Intent("com.android.music.musicservicecommand");
