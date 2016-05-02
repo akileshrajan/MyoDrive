@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.DeviceListener;
@@ -44,31 +45,41 @@ public class BackgroundActivity extends Activity {private DeviceListener mListen
     public void onPose(Myo myo, long timestamp, Pose pose) {
         Log.i("pose", "Pose: " + pose);
         boolean sleep = true;
-
+        TextView  tStatus=(TextView)findViewById(R.id.status);
         switch (pose) {
             case UNKNOWN:
+                tStatus.setText("Lock");
                 break;
             case FINGERS_SPREAD:
                 //volumeMode = true;
+                tStatus.setText("Spread Fingers");
                 playPauseMusic();
+                volumeMode = false;
                 break;
             case REST:
+                tStatus.setText("Lock");
                 volumeMode = false;
                 break;
             case DOUBLE_TAP:
                 volumeMode = false;
+                tStatus.setText("Unlock");
                 myo.unlock(Myo.UnlockType.TIMED);
                 break;
             case FIST:
                 volumeMode = true;
+                tStatus.setText("Fist");
                 sleep = false;
+
                 break;
             case WAVE_IN:
+                tStatus.setText("Wave in");
                 waveInAction();
                 volumeMode = false;
                 break;
             case WAVE_OUT:
+                tStatus.setText("Wave out");
                 waveOutAction();
+
                 volumeMode = false;
                 break;
         }

@@ -5,14 +5,14 @@
     <TableRow>
         <ImageView
             android:id="@+id/img"
-            android:layout_margin="20dp"
-            android:layout_width="80dp"
-            android:layout_height="80dp"/>
+            android:layout_margin="15dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"/>
 
         <TextView
 
             android:id="@+id/txt"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="34dp"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:textColor="@color/myosdk__thalmic_blue"/>

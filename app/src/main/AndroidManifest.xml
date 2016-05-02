@@ -17,12 +17,6 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CALL_PRIVILEGED"/>
 
-    <receiver android:name=".PhoneStateReceiver" >
-        <intent-filter android:priority="0" >
-            <action android:name="android.intent.action.PHONE_STATE" />
-            <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-        </intent-filter>
-    </receiver>
 
 
     <application
@@ -50,6 +44,13 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/Invisible">
         </activity>
+        <receiver android:name=".PhoneStateReceiver" >
+            <intent-filter android:priority="0" >
+                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
